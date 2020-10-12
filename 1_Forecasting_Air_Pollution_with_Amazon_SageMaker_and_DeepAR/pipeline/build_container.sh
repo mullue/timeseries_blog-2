@@ -10,7 +10,7 @@ processing_repository_uri=$(sh ./pipeline/get_processing_repo_uri.sh ${ACCOUNT_I
 echo Processing_repo_uri: $processing_repository_uri
 
 # build docker container
-docker build -t $ECR_REPO_NAME -f ./ml_pipeline_preprocessing_Dockerfile .
+docker build -t $ECR_REPO_NAME -f ./pipeline/ml_pipeline_preprocessing_Dockerfile .
 
 # # Login and push the built docker image
 $(aws ecr get-login --region ${REGION} --registry-ids ${ACCOUNT_ID} --no-include-email)
