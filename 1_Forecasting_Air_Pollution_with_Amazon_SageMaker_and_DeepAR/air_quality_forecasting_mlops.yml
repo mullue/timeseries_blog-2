@@ -22,12 +22,12 @@ Parameters:
     Description: Enter the name of the SageMaker notebook instance.
 
   GitHubUser:
-    Default: tom5610
+    Default: glyfnet
     Type: String
     Description: Your GitHub username 
 
   GitHubRepo:
-    Default: timeseries-blog
+    Default: timeseries_blog
     Type: String
     Description: Name of the GitHub repository
 
@@ -91,6 +91,10 @@ Resources:
           - Effect: Allow 
             Principal:
               Service: codebuild.amazonaws.com
+            Action: sts:AssumeRole
+          - Effect: Allow 
+            Principal:
+              Service: states.amazonaws.com
             Action: sts:AssumeRole
           - Effect: Allow 
             Principal:
@@ -403,8 +407,8 @@ Resources:
                     git config --global credential.UseHttpPath true
                     cp /root/.gitconfig /home/ec2-user/ && chown ec2-user:ec2-user /home/ec2-user/.gitconfig
                     echo "Clone the public repo and push it to codecommit repo"
-                    git clone -b ${GitHubBranch} "https://github.com/${GitHubUser}/${GitHubRepo}.git" /tmp/mlops-repo
-                    cd /tmp/mlops-repo
+                    git clone -b ${GitHubBranch} "https://github.com/${GitHubUser}/${GitHubRepo}.git" /SageMaker/${GitHubRepo}
+                    cd /SageMaker/${GitHubRepo}
                     git remote add codecommit ${CodeCommitRepository.CloneUrlHttp}
                     git push --set-upstream codecommit ${GitHubBranch}
               - Ref: AWS::NoValue
@@ -455,7 +459,7 @@ Resources:
   SageMakerCodeRepository:
     Type: AWS::SageMaker::CodeRepository 
     Properties:
-      CodeRepositoryName: !Ref GitHubRepo
+      CodeRepositoryName: !Join [ "-",  !Split [ "_" , !Ref GitHubRepo ] ]
       GitConfig:
         RepositoryUrl:
           Fn::If:
