@@ -80,6 +80,7 @@ def featurize(raw):
         index = pd.date_range(df.index.min(), df.index.max(), freq='1H')
         return df.reindex(pd.Index(index, name='timestamp'))
 
+
     # Sort and index by location and time
     categorical_levels = ['country', 'city', 'location', 'parameter']
     index_levels = categorical_levels + ['timestamp']
@@ -92,7 +93,7 @@ def featurize(raw):
 
     # Back fill missing values
     filled = downsampled.groupby(level=categorical_levels).apply(fill_missing_hours)
-    filled[filled['value'].isnull()].groupby('location').count().describe()
+    #filled[filled['value'].isnull()].groupby('location').count().describe()
     
     filled['value'] = filled['value'].interpolate().round(2)
     filled['point_latitude'] = filled['point_latitude'].fillna(method='pad')
@@ -107,15 +108,6 @@ def featurize(raw):
     aggregated.reset_index(inplace=True)
     aggregated.set_index(['id']+categorical_levels, inplace=True)
     
-    metadata = gpd.GeoDataFrame(
-        aggregated.drop(columns=['target','start']), 
-        geometry=gpd.points_from_xy(aggregated.point_longitude, aggregated.point_latitude), 
-        crs={"init":"EPSG:4326"}
-    )
-    metadata.drop(columns=['point_longitude', 'point_latitude'], inplace=True)
-    # set geometry index
-    metadata.set_geometry('geometry')
-
     # Add Categorical features
     level_ids = [level+'_id' for level in categorical_levels]
     for l in level_ids:
@@ -149,11 +141,33 @@ def filter_dates(df, min_time, max_time, frequency):
     filtered = filtered[filtered['target'].str.len() > 0]
     return filtered
 
+def get_tests(features, split_dates, frequency, context_length, prediction_length):
+    tests = []
+    end_date_delta = pd.Timedelta(f'{frequency} hour') * context_length
+    prediction_id = 0
+    for split_date in split_dates:
+        context_end = split_date + end_date_delta
+        test = filter_dates(features, split_date, context_end, f'{frequency}H')
+        test['prediction_start'] = context_end
+        test['prediction_id'] = prediction_id
+        test['start'] = test['start'].dt.strftime('%Y-%m-%d %H:%M:%S')
+        tests.append(test)
+        prediction_id += 1
+        
+    tests = pd.concat(tests).reset_index().set_index(['id', 'prediction_id', 'prediction_start']).sort_index()
+    return tests
+
 def split_train_test_data(features, days = 30):
     train_test_split_date = date.today() - timedelta(days = days)
     train = filter_dates(features, None, train_test_split_date, '1H')
     test = filter_dates(features, train_test_split_date, None, '1H')
     return train, test
+
+def generate_test_set(test):
+    ten_days_ago =  date.today() - timedelta(days=10)
+    test_dates = pd.date_range(ten_days_ago, periods=216, freq='1H')    
+    tests = get_tests(test, test_dates, '1', 3, 48)
+    return tests[['start','target','cat']]
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -176,7 +190,10 @@ if __name__ == "__main__":
     # Query Sydney OpenAQ data
     raw = get_sydney_openaq_data(bucket_name)
     features = featurize(raw)
-    train, test = split_train_test_data(features)
+    train, test = split_train_test_data(features, split_days)
+    
+    # generate test data
+    test_data = generate_test_set(test)
 
     all_features_output_path = os.path.join(
         "/opt/ml/processing/output/all", "all_features.json"
@@ -194,4 +211,4 @@ if __name__ == "__main__":
         "/opt/ml/processing/output/test", "test.json"
     )
     print("Saving test features to {}".format(test_features_output_path))
-    test.to_json(test_features_output_path, orient='records', lines = True)
+    test_data.to_json(test_features_output_path, orient='records', lines = True)
