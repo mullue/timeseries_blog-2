@@ -165,9 +165,10 @@ def split_train_test_data(features, days = 30):
 
 def generate_test_set(test):
     ten_days_ago =  date.today() - timedelta(days=10)
-    test_dates = pd.date_range(ten_days_ago, periods=216, freq='1H')    
+    test_dates = pd.date_range(ten_days_ago, periods=240, freq='1H')    
     tests = get_tests(test, test_dates, '1', 3, 48)
-    return tests[['start','target','cat']]
+    lastest_100_batch = tests.sort_values('prediction_id', ascending = False).head(100)
+    return lastest_100_batch[['start','target','cat']]
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -192,9 +193,6 @@ if __name__ == "__main__":
     features = featurize(raw)
     train, test = split_train_test_data(features, split_days)
     
-    # generate test data
-    test_data = generate_test_set(test)
-
     all_features_output_path = os.path.join(
         "/opt/ml/processing/output/all", "all_features.json"
     )
@@ -211,4 +209,13 @@ if __name__ == "__main__":
         "/opt/ml/processing/output/test", "test.json"
     )
     print("Saving test features to {}".format(test_features_output_path))
-    test_data.to_json(test_features_output_path, orient='records', lines = True)
+    test.to_json(test_features_output_path, orient='records', lines = True)
+    
+    # generate test data
+    test_data = generate_test_set(test)
+
+    batch_transform_latest_100_output_path = os.path.join(
+        "/opt/ml/processing/output/test", "batch_transform_test.json"
+    )
+    print("Saving batch transform test features to {}".format(batch_transform_latest_100_output_path))
+    test_data.to_json(batch_transform_latest_100_output_path, orient='records', lines = True)    
