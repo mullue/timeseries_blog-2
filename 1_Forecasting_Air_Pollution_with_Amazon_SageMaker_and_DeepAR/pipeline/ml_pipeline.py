@@ -1,6 +1,6 @@
 from ml_pipeline_dependencies import *
 
-PREPROCESSING_SCRIPT_LOCATION = "ml_pipeline_preprocessing.py"
+PREPROCESSING_SCRIPT_LOCATION = "./pipeline/ml_pipeline_preprocessing.py"
 
 def upload_preprocess_code(bucket_name):
     input_code_uri = sagemaker_session.upload_data(
