@@ -46,3 +46,7 @@ Especially, the second notebook is part of the demo of ML Pipeline creation for 
 * CodeBuild project process `preprocess` container build and ML Pipeline creation & execution with Step Functions state machine. (***the workflow won't be part of CFN stack, hence, you may manually remove it while deleting CFN stack.***)
 * State machine demo ML pipeline and orchestrate data preprocessing, model training/tuning and batch transform.
 * Amazon SageMaker Notebook instance can be used to explore notebooks.
+
+For ML Pipeline Process, Refer to
+
+![ML Pipeline Process](./img/air_quality_forecasting_ml_pipeline.png)
