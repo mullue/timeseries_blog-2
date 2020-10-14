@@ -1,6 +1,6 @@
 import uuid
 import time
-import boto3
+import boto3, json
 import argparse
 import os, urllib.request
 
