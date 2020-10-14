@@ -18,16 +18,16 @@ Parameters:
 
   NotebookName:
     Type: String
-    Default: air-quality-forecasting-workshop
+    Default: forecasting-workshop
     Description: Enter the name of the SageMaker notebook instance.
 
   GitHubUser:
-    Default: tom5610
+    Default: glyfnet
     Type: String
     Description: Your GitHub username 
 
   GitHubRepo:
-    Default: timeseries-blog
+    Default: timeseries_blog
     Type: String
     Description: Name of the GitHub repository
 
@@ -57,7 +57,7 @@ Parameters:
 
   NotebookInstanceType:
     Type: String
-    Default: ml.t2.medium
+    Default: ml.t3.large
     Description: Enter the SageMaker notebook instance type. 
 
   RequireModelTraining:
@@ -94,6 +94,10 @@ Resources:
             Action: sts:AssumeRole
           - Effect: Allow 
             Principal:
+              Service: states.amazonaws.com
+            Action: sts:AssumeRole
+          - Effect: Allow 
+            Principal:
               Service: lambda.amazonaws.com
             Action: sts:AssumeRole
       Path: "/"
@@ -111,6 +115,7 @@ Resources:
             - Sid: EventAccess
               Effect: Allow
               Action:
+                - ssm:GetParameter
                 - ssm:GetParameters
               Resource:
                 - arn:aws:ssm:*:*:parameter/CodeBuild/*
@@ -403,8 +408,8 @@ Resources:
                     git config --global credential.UseHttpPath true
                     cp /root/.gitconfig /home/ec2-user/ && chown ec2-user:ec2-user /home/ec2-user/.gitconfig
                     echo "Clone the public repo and push it to codecommit repo"
-                    git clone -b ${GitHubBranch} "https://github.com/${GitHubUser}/${GitHubRepo}.git" /tmp/mlops-repo
-                    cd /tmp/mlops-repo
+                    git clone -b ${GitHubBranch} "https://github.com/${GitHubUser}/${GitHubRepo}.git" /tmp/${GitHubRepo}
+                    cd /tmp/${GitHubRepo}
                     git remote add codecommit ${CodeCommitRepository.CloneUrlHttp}
                     git push --set-upstream codecommit ${GitHubBranch}
               - Ref: AWS::NoValue
@@ -426,6 +431,7 @@ Resources:
       NotebookInstanceName: !Ref NotebookName
       RoleArn: !GetAtt SageMakerRole.Arn
       VolumeSizeInGB: !Ref VolumeSize
+      DefaultCodeRepository: !GetAtt SageMakerCodeRepository.CodeRepositoryName
       LifecycleConfigName: !GetAtt NotebookLifecycle.NotebookInstanceLifecycleConfigName
  
   S3Bucket:
@@ -455,7 +461,7 @@ Resources:
   SageMakerCodeRepository:
     Type: AWS::SageMaker::CodeRepository 
     Properties:
-      CodeRepositoryName: !Ref GitHubRepo
+      CodeRepositoryName: !Join [ "-",  !Split [ "_" , !Ref GitHubRepo ] ]
       GitConfig:
         RepositoryUrl:
           Fn::If:
@@ -568,7 +574,7 @@ Resources:
     Properties:
       Name: /ml_pipeline/workflow_name
       Type: String
-      Value: !Sub ${ModelName}-ml-pipeline
+      Value: !Sub auto-${ModelName}-ml-pipeline
 
   RequireHPOParameter:
     Type: AWS::SSM::Parameter

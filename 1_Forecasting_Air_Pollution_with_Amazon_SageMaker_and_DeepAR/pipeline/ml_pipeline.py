@@ -1,6 +1,6 @@
 from ml_pipeline_dependencies import *
 
-PREPROCESSING_SCRIPT_LOCATION = "ml_pipeline_preprocessing.py"
+PREPROCESSING_SCRIPT_LOCATION = "./pipeline/ml_pipeline_preprocessing.py"
 
 def upload_preprocess_code(bucket_name):
     input_code_uri = sagemaker_session.upload_data(
@@ -221,7 +221,42 @@ def create_endpoint_step(execution_input):
         update = False
     )
     return endpoint_step
+
+def create_batch_transform_step(
+    execution_input,
+    bucket_name
+):
+    # assume we only check '0.5' quatiles predictions.
+    environment_param = {
+        'num_samples': 20,
+        'output_types': ['quantiles'],
+        'quantiles': ['0.5']
+    }
     
+    transformer = Transformer(
+        execution_input["ModelName"],
+        1,
+        'ml.c5.2xlarge',
+        output_path=f's3://{bucket_name}/sagemaker/batch_transform/output',
+        sagemaker_session = sagemaker_session,
+        strategy='MultiRecord',
+        assemble_with='Line',
+        env = {
+            'DEEPAR_INFERENCE_CONFIG': json.dumps(environment_param)
+        }
+    )
+
+    output_data = f"s3://{bucket_name}/preprocessing/output"
+    transformStep = TransformStep(
+        state_id = "Batch Transform Step",
+        transformer = transformer,
+        job_name = execution_input["TransformJobName"],
+        model_name = execution_input["ModelName"],
+        data = f"{output_data}/test/batch_transform_test.json",
+        split_type = 'Line'
+    )    
+    return transformStep
+
 def create_workflow(region, bucket_name, workflow_name, workflow_execution_role, processing_repository_uri):
     
     # Workflow Execution parameters
@@ -233,7 +268,8 @@ def create_workflow(region, bucket_name, workflow_name, workflow_execution_role,
             "TrainingJobName": str,
             "TuningJobName": str,
             "ModelName": str,
-            "EndpointName": str
+            "EndpointName": str,
+            "TransformJobName": str
         }
     )
     image_uri = sagemaker.image_uris.retrieve('forecasting-deepar', region, '1')
@@ -246,11 +282,14 @@ def create_workflow(region, bucket_name, workflow_name, workflow_execution_role,
     existing_model_step = create_existing_model_step(execution_input, image_uri)
     endpoint_config_step = create_endpoint_configurgation_step(execution_input)
     endpoint_step = create_endpoint_step(execution_input)
+    transformStep = create_batch_transform_step(execution_input, bucket_name)
     
-    
-    training_path = Chain([training_step, model_step, endpoint_config_step, endpoint_step])
-    deploy_existing_model_path = Chain([existing_model_step, endpoint_config_step, endpoint_step])
-    
+    # Use Batch Transform instead of endpoint hosting to do one-off model prediction.
+#     training_path = Chain([training_step, model_step, endpoint_config_step, endpoint_step])
+#     deploy_existing_model_path = Chain([existing_model_step, endpoint_config_step, endpoint_step])
+    training_path = Chain([training_step, model_step, transformStep])
+    deploy_existing_model_path = Chain([existing_model_step, transformStep])
+
     hpo_choice = Choice(
         "To do HPO?"
     )
@@ -320,6 +359,7 @@ def main(
     training_job_name = f"aqf-training-{uuid.uuid1().hex}"
     model_job_name = f"aqf-model-{uuid.uuid1().hex}"
     endpoint_job_name = f"aqf-endpoint-{uuid.uuid1().hex}"
+    batch_transform_job_name = f"aqf-transform-{uuid.uuid1().hex}"
     todoHPO = require_hpo.lower() in ['true', '1', 'yes', 't']
     todoTraining = require_model_training.lower() in ['true', '1', 'yes', 't']
     
@@ -331,7 +371,8 @@ def main(
             "TrainingJobName": training_job_name,
             "TuningJobName": tuning_job_name,
             "ModelName": model_job_name,
-            "EndpointName": endpoint_job_name
+            "EndpointName": endpoint_job_name,
+            "TransformJobName": batch_transform_job_name
         }
     )
 
