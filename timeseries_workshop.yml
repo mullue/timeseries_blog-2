@@ -156,6 +156,15 @@ Resources:
               Effect: Allow
               Action: kinesisanalytics:*
               Resource: "*"
+        - PolicyName: CFNFullAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+            - Sid: CFNFullAccess
+              Effect: Allow
+              Action: cloudformation:*
+              Resource: "*"
+        
 
   PipelineRole:
     Type: "AWS::IAM::Role"

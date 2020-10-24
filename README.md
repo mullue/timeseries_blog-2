@@ -12,6 +12,36 @@ Many of the methodologies used for time series analysis have been around for a l
 ## Time series labs
 This time series workshop is broken into four independent labs that explore applying time series algorithms to a variety of different data sets to solve different use cases.  Each lab will introduce more topics and use cases, so pick the ones of interest to you. Each individual lab also has multiple parts, so you can pick what is more relevant to your role or upcoming project.  It's recommended you start with the first introductory lab on air quality prediction, and then explore other time-series labs to broaden your knowledge.
 
+## Lab environment setup
+To setup the lab environment, please create a AWS CloudFormation stack with [timeseries_workshop.yml](./timeseries_workshop.yml). Please note that the stack will spin up Amazon SageMaker notebook instance with proper access to run all labs. Especially, when creating the CFN stack, if you accepts all default parameter values, we will create a git repository under Amazon CodeCommit and map it as a code repository for the notebook instance; or, you may fork 'timeseries_blog' repo to your own and provide yours (such as GitHub username and token) so that the code repository created is mapped to your GitHub repository. Furthermore, the CFN stack will include a ML pipeline for Lab 1.
+
+> Please note that once your SageMaker code repository is mapping to CodeCommit one, all your code changes in the SageMaker notebook instance can only be pushed to CodeCommit repository by default. If you want to interact with your GitHub repository, you may consider adding remote repository with 'git remote add XXX git-uri', etc.
+
+### CloudFormation Stack Creation
+
+> Assumed User is create the labs environment in AWS Sydney Region. If not, please correct the console link's query parameter `region`.
+
+#### Steps 
+
+1. If your workshop environment has been setup with AWS Event Engine, you can skip the CFN stack creation steps; otherwise, download github repo - [timeseries_blog](https://github.com/glyfnet/timeseries_blog.git) and launch AWS CloudFormation stack with referring to local [timeseries_workshop.yml](./timeseries_workshop.yml). Please accept the default parameter values which will refer to CodeCommit repo to integrate with CodePipeline for ML Pipeline creation and execution.
+
+![CloudFormation Stack Parameter Screen](./1_Forecasting_Air_Pollution_with_Amazon_SageMaker_and_DeepAR/img/lab_desc_cfn_stack_parameters.png)
+
+2. Once filling in stack name, click 'Next' button twice, then, scroll down to bottom of the page. Check ***I acknowledge that AWS CloudFormation might create IAM resources with custom names.*** and Click 'Click stack' button. The whole stack creation takes approx. 5-8mins.
+
+![CloudFormation Stack Creation Screen](./1_Forecasting_Air_Pollution_with_Amazon_SageMaker_and_DeepAR/img/lab_desc_cfn_stack_creation.png)
+
+3. Once CFN stack is created, you can explore pipeline setup in [AWS CodePipeline](https://console.aws.amazon.com/codesuite/codepipeline/pipelines?region=ap-southeast-2). Also, please note that CodePipeline will be automatically triggered once the stack  creation is done (as related CodeCommit project). 
+
+![CodePipeline Console Screen](./1_Forecasting_Air_Pollution_with_Amazon_SageMaker_and_DeepAR/img/lab_desc_codepipeline.png)
+
+4. Meanwhile, you can explore the notebooks with [Amazon SageMaker Notebook instances](https://console.aws.amazon.com/sagemaker/home?region=ap-southeast-2#/notebook-instances). Then, click 'Open Jupyter' or 'Open JupyterLab' to view the notebooks.
+
+![Amazon SageMaker Notebook Instances Screen](./1_Forecasting_Air_Pollution_with_Amazon_SageMaker_and_DeepAR/img/lab_desc_sagemaker_notebook_instances.png)
+
+1. For example, once 'Open Jupyter', you can start playing with the notebook. Highly recommend that you should start with [Forecasting Air Quality with Amazon SageMaker and DeepAR](./1_Forecasting_Air_Pollution_with_Amazon_SageMaker_and_DeepAR/01_train_and_evaluate_air_quality_deepar_model.ipynb).
+
+![Jupyter Notebooks Screen](./1_Forecasting_Air_Pollution_with_Amazon_SageMaker_and_DeepAR/img/lab_desc_lab_jupyter_notebooks.png)
 
 ## Lab 1:
 ## Forecast air quality with Amazon SageMaker and DeepAR 
@@ -46,7 +76,7 @@ The second lab covers creating the ML production system:
 - Architecture design
 - Feature engineering with SageMaker pipelines
 - SageMaker Batch transforms
-- Step functions and lambda integration with SageMaker
+- Step functions integration with SageMaker
 
 [start the lab](1_Forecasting_Air_Pollution_with_Amazon_SageMaker_and_DeepAR/02_manual_ml_pipeline_creation_for_air_quality_forecasting.ipynb)
 
