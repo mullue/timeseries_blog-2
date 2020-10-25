@@ -11,6 +11,8 @@ Especially, the second notebook demo how to manually create a ML Pipeline for th
  
 ## Pipeline Design
 
+The pipeline design is inspired by [Amazon SageMaker Safe Deployment Pipeline](https://github.com/aws-samples/amazon-sagemaker-safe-deployment-pipeline).
+
 ![Pipline Design](./img/aqf-ml-pipeline-design.png)
 
 ### Description
