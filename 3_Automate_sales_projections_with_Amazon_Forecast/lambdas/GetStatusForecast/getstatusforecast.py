@@ -1,3 +1,7 @@
+class SatusActive(ValueError):
+    """Error thrown if previous job still in progress (catch & retry this in your SFn)"""
+    pass
+
 def lambda_handler(event, context):
     import boto3
     forecast = boto3.client('forecast')
@@ -6,9 +10,7 @@ def lambda_handler(event, context):
         ForecastArn=event['ForecastArn']
     )
     
-    if response['Status'] == 'ACTIVE':
-        event['is_active_forecast'] = True
-    else:
-        event['is_active_forecast'] = False
+    if response['Status'] != 'ACTIVE':
+        raise SatusActive(f"previous job is running.")
 
     return event

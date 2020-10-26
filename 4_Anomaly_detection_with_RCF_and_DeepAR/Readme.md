@@ -1,13 +1,12 @@
-# Anomaly detection from clickstream time series (with SageMaker algorithm Random Cut Forest and DeepAR)
+# Anomaly detection for click-stream data with SageMaker 
 
-This is the 4th post of time series anaytics series. This post will look at the anomaly detection form time series data. Anomaly detection has wide range of applications, from finding outliers for preprocessing data to monitoring business performance for sudden spike or drop alerts in business metrics. For example, it is used for finding abnormal events in the following data:
-
-- The number of visitors or clickstreams in e-commerce websites
+Anomaly detection algorithms are used to find changes in patterns of data and have a wide range of applications, from detecting sudden changes in business metrics, detecting failure in complex systems, predictive maintenance, and even for moinitoring data pipelines for unexpected changes. Some other types of events that can be detected include:
+- Changes in the number of visitors or clickstreams on e-commerce websites
 - Changes in the number of items sold or the amount of sales in retail business
-- Changes in usage of memory and CPU in web service infrastructure
-- Changes in sensing values such as temperature, vibration, current, torque, etc. from production machines or equipments
+- Changes in usage of disk, memory or CPU in applications and systems infrastructure
+- Changes in values such as temperature, vibration, current, torque from production machines and equipment
 
-In many cases, human eyes can find irregular changes easily if these data are visualized through graph. However, in real life, it is impossible for humans to visually check all hundreds of thousands of time series data generated simultaneously. Most of the monitoring systems are provided with a alarming features with upper or lower limits, but they end up generating too many unnecessary alarms. 
+In many cases, human eyes can find irregular changes easily if the data is visualized through a graph. In real life, it is impossible for humans to visually check hundreds of thousands of data points generated simultaneously. Most of the monitoring systems are provided with a alarming features with upper or lower limits, but they end up generating too many unnecessary alarms. 
 
 ![](imgs/randseries.png)
 

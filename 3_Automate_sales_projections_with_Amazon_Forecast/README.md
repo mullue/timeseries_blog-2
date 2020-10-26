@@ -1,63 +1,13 @@
-# Automate sales projections with Amazon Forecast, QuickSight and AWS Step Functions
+In this workshop, we will build a forecasting pipeline with Amazon Forecast using Step Functions.
+After building the pipeline, we store the retail data in S3, which automatically performs data import, training, and forecasting for Amazon Forecast and stores the results in S3. The results can be visualized in Amazon QuickSight, but for this workshop, we'll simply graph the results in a notebook.
 
-Accurate demand forecasting has the potential to make a huge impact on your business: For example optimizing stocked inventory, avoiding lost revenue opportunities due to stock-out, and planning efficient employee shifts that serve your customers better.
+Here are the steps.
+First, git clone the repository and run 0_project_dependencies.ipynb. This will create a CloudFormation demo environment, running in a boto3-enabled environment, where CloudFormation allows you to run Lambda functions, CloudTrail, SageMaker notebook instances, interfaces The S3 bucket is created as follows.
 
-In this example, we show how to build an automated, serverless pipeline to generate forecasts as new data batches become available - and then visualize the results in an Amazon QuickSight dashboard.
+1_build_statemachine.ipynb on the built SageMaker notebook instance. Run. This will build a pipeline with Step Functions, which is the theme of this workshop. Also, set up CloudWatchEvents Rule so that StepFunctions is executed when the file is stored in S3.
 
-We'll model the [Online Retail II Data Set](https://archive.ics.uci.edu/ml/datasets/Online+Retail+II#) from the public [UC Irvine Machine Learning Repository](https://archive.ics.uci.edu/ml/index.php) - recording just over 1 million transactions from a UK-based online retail company.
+On the SageMaker notebook instance, create 2_preprocess_and_put_dataset.ipynb to download and format the retail data. In this case, we will simply estimate the daily sales amount in the United Kingdom. We store the formatted data in S3 and make sure that the StepFunctions statemachine is started. Wait until the pipeline is completed.
 
+When the pipeline process is complete, confirm that the predictions have been output to S3. 3_visualization.ipynb to simply visualize your prediction results. I hope you've found it easy to build your pipeline. The final step is to clean up the mess.
 
-## The AWS Well-Architected Framework (Machine Learning Lens)
-
-This module applies principles from the [Machine Learning Lens](https://docs.aws.amazon.com/wellarchitected/latest/machine-learning-lens/welcome.html) ([PDF](https://d1.awsstatic.com/whitepapers/architecture/wellarchitected-Machine-Learning-Lens.pdf)) of the [AWS Well-Architected](https://d1.awsstatic.com/whitepapers/architecture/wellarchitected-Machine-Learning-Lens.pdf) framework.
-
-In particular noting from the [Operational Excellence Best Practices](https://docs.aws.amazon.com/wellarchitected/latest/machine-learning-lens/evolve.html) section (PDF p43):
-
-> **Additional Training Data:** AWS supports mechanisms for automatically triggering retraining based on new data PUT to an Amazon S3 bucket. The preferred method to initiate a controlled execution of model retraining is to set up an ML pipeline that includes an event trigger based on changes to a source Amazon S3 bucket. To detect the presence of new training data in an S3 bucket, CloudTrail combined with CloudWatch Events allows you to trigger an AWS Lambda function or AWS Step Functions workflow to initiate retraining tasks in your training pipeline. The following figure illustrates the practice showing AWS CodePipeline with ML Services: 
-This module is based on Well-Architected Machine Learning Lends
-
-
-## Architecture overview
-
-![01_arch_design_2](https://user-images.githubusercontent.com/27226946/89359520-02cab680-d701-11ea-979c-c1f35cb07292.png)
-
-
-### AWS services used
-
-* Amazon Forecast
-* Amazon QuickSight
-* Amazon S3
-* AWS Lambda
-* AWS Step Functions
-
-
-## Visualisations
-
-* Screen Shots of forecast console during data import, training and evaluation
-* Screen shots of creating QuickSight report
-* Architecture diagram
-
-
-## Blog Outline
-
-1. Introduction
-2. Problem definition
-3. Architecture design
-4. Data    - Download data   - Data analysis (see missing data etc.)
-5. Forecast   - import dataset    - AutoML and HPO   - Evaluation
-6. QuickSight - Build report
-7. Lambda trigger   - lambda job to trigger retrain and report building when new data posted to s3
-8. Conclusion   - Other resources   - Intro next blog post in series
-
-
-## Reference
-
-* [AWS Well-Architected Framework – Machine Learning Lens](https://d1.awsstatic.com/whitepapers/architecture/wellarchitected-Machine-Learning-Lens.pdf)
-* (AWS ML Blog) [Automated and continuous deployment of Amazon SageMaker models with AWS Step Functions](https://aws.amazon.com/blogs/machine-learning/automated-and-continuous-deployment-of-amazon-sagemaker-models-with-aws-step-functions/)
-* (AWS Step Functions Developer Guide) [Manage Amazon SageMaker with Step Functions](https://docs.aws.amazon.com/step-functions/latest/dg/connect-sagemaker.html)
-* (AWS ML Blog) [Automating your Amazon Forecast workflow with Lambda, Step Functions, and CloudWatch Events rule](https://aws.amazon.com/blogs/machine-learning/automating-your-amazon-forecast-workflow-with-lambda-step-functions-and-cloudwatch-events-rule/)
-* (AWS ML Blog) [Building AI-powered forecasting automation with Amazon Forecast by applying MLOps](https://aws.amazon.com/blogs/machine-learning/building-ai-powered-forecasting-automation-with-amazon-forecast-by-applying-mlops/)
-* (AWS Step Functions Developer Guide) [Starting a State Machine Execution in Response to Amazon S3 Events](https://docs.aws.amazon.com/step-functions/latest/dg/tutorial-cloudwatch-events-s3.html)
-* (Amazon QuickSight User Guide) [Creating a Dataset Using Amazon S3 Files](https://docs.aws.amazon.com/quicksight/latest/user/create-a-data-set-s3.html)
-* (AWS Samples) [Forecast Visualization Automation Blog](https://github.com/aws-samples/amazon-forecast-samples/tree/master/ml_ops/visualization_blog)
-* (AWS ML Blog) [Analyzing contact center calls—Part 1: Use Amazon Transcribe and Amazon Comprehend to analyze customer sentiment](https://aws.amazon.com/blogs/machine-learning/analyzing-contact-center-calls-part-1-use-amazon-transcribe-and-amazon-comprehend-to-analyze-customer-sentiment/)
+Run 4_clean.ipynb on your SageMaker notebook instance to clean up all the resources used. This concludes the workshop.
