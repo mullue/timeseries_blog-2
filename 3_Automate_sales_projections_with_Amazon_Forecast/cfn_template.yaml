@@ -178,7 +178,7 @@ Resources:
         Fn::GetAtt:
         - SageMakerNotebookRole
         - Arn
-      DefaultCodeRepository: https://github.com/yito0427/tsb.git
+      DefaultCodeRepository: https://github.com/glyfnet/timeseries_blog.git
   InputCloudTrailBucket:
     Type: AWS::S3::Bucket
     Properties:
