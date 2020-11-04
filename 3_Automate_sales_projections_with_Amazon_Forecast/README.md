@@ -13,8 +13,10 @@ First, git clone the repository and run 0_project_dependencies.ipynb. This will 
 
 On the SageMaker notebook instance, create 2_preprocess_and_put_dataset.ipynb to download and format the retail data. In this case, we will simply estimate the daily sales amount in the United Kingdom. We store the formatted data in S3 and make sure that the StepFunctions statemachine is started. Wait until the pipeline is completed.
 
-When the pipeline process is complete, confirm that the predictions have been output to S3. 3_visualization.ipynb to simply visualize your prediction results. I hope you've found it easy to build your pipeline. The final step is to clean up the mess.
+When the pipeline process is complete, confirm that the predictions have been output to S3. 3_visualization.ipynb to simply visualize your prediction results. I hope you've found it easy to build your pipeline. 
 
+
+The final step is to clean up the mess.
 Run 4_clean.ipynb on your SageMaker notebook instance to clean up all the resources used. This concludes the workshop.
 
 
@@ -27,3 +29,8 @@ The pipeline design is inspired by [AWS blog post here](https://aws.amazon.com/b
 For ML Pipeline Process, Refer to
 
 ![ML Pipeline Process](./img/SFn_pipeline.png)
+
+
+## Conclusion
+
+This workshop focuses on understanding and gives you experience building a pipeline with the simplest code. We hope that you will use this source code as a basis for customizing it to fit your own project requirements.
