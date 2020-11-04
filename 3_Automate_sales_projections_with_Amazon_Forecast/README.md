@@ -15,6 +15,7 @@ On the SageMaker notebook instance, create 2_preprocess_and_put_dataset.ipynb to
 
 When the pipeline process is complete, confirm that the predictions have been output to S3. 3_visualization.ipynb to simply visualize your prediction results. I hope you've found it easy to build your pipeline. 
 
+![ForecastGraph](./img/forecast_graph.png)
 
 The final step is to clean up the mess.
 Run 4_clean.ipynb on your SageMaker notebook instance to clean up all the resources used. This concludes the workshop.
@@ -28,9 +29,7 @@ The pipeline design is inspired by [AWS blog post here](https://aws.amazon.com/b
 
 For ML Pipeline Process, Refer to
 
-![ML Pipeline Process](./img/SFn_pipeline.png)
-
-<img src="./img/SFn_pipeline.png" width="320">
+<img src="./img/SFn_pipeline.png" width="120">
 
 ## Conclusion
 
