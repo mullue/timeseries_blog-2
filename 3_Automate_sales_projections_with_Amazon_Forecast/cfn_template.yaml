@@ -124,6 +124,7 @@ Resources:
       - arn:aws:iam::aws:policy/CloudWatchEventsFullAccess
       - arn:aws:iam::aws:policy/AmazonForecastFullAccess
       - arn:aws:iam::aws:policy/AWSCloudFormationFullAccess
+      - arn:aws:iam::aws:policy/AWSCloudTrailFullAccess
   NotebookConfig:
     Type: AWS::SageMaker::NotebookInstanceLifecycleConfig
     Properties:
