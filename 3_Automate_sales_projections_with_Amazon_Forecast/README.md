@@ -1,5 +1,10 @@
+# Building automated pipeline for sales forecasting with simple code
+
 In this workshop, we will build a forecasting pipeline with Amazon Forecast using Step Functions.
 After building the pipeline, we store the retail data in S3, which automatically performs data import, training, and forecasting for Amazon Forecast and stores the results in S3. The results can be visualized in Amazon QuickSight, but for this workshop, we'll simply graph the results in a notebook.
+
+
+## Lab Structure
 
 Here are the steps.
 First, git clone the repository and run 0_project_dependencies.ipynb. This will create a CloudFormation demo environment, running in a boto3-enabled environment, where CloudFormation allows you to run Lambda functions, CloudTrail, SageMaker notebook instances, interfaces The S3 bucket is created as follows.
@@ -11,3 +16,14 @@ On the SageMaker notebook instance, create 2_preprocess_and_put_dataset.ipynb to
 When the pipeline process is complete, confirm that the predictions have been output to S3. 3_visualization.ipynb to simply visualize your prediction results. I hope you've found it easy to build your pipeline. The final step is to clean up the mess.
 
 Run 4_clean.ipynb on your SageMaker notebook instance to clean up all the resources used. This concludes the workshop.
+
+
+## Pipeline Design
+
+The pipeline design is inspired by [AWS blog post here](https://aws.amazon.com/blogs/machine-learning/building-ai-powered-forecasting-automation-with-amazon-forecast-by-applying-mlops/).
+
+![Pipline Design](./img/architecture.png)
+
+For ML Pipeline Process, Refer to
+
+![ML Pipeline Process](./img/sfn_pipeline.png)
