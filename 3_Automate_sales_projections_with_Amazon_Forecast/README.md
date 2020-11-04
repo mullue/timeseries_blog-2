@@ -30,6 +30,7 @@ For ML Pipeline Process, Refer to
 
 ![ML Pipeline Process](./img/SFn_pipeline.png)
 
+<img src="./img/SFn_pipeline.png" width="320">
 
 ## Conclusion
 
