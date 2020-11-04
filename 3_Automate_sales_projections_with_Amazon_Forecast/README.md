@@ -26,4 +26,4 @@ The pipeline design is inspired by [AWS blog post here](https://aws.amazon.com/b
 
 For ML Pipeline Process, Refer to
 
-![ML Pipeline Process](./img/sfn_pipeline.png)
+![ML Pipeline Process](./img/SFn_pipeline.png)
